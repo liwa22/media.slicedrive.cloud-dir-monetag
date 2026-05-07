@@ -29,22 +29,28 @@ const title = document.getElementById("title");
 let clicked = false;
 let redirected = false;
 
-// ambil video
+// ambil id dari pathname
+const id = decodeURIComponent(
+  window.location.pathname.replace(/^\/+/, '')
+);
+
 fetch(JSON_URL)
 .then(res => res.json())
 .then(data => {
-  const vids = data.videos;
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get("id");
 
-  let selected = id ? vids.find(v => v.id === id) : null;
-  if (!selected) selected = vids[Math.floor(Math.random() * vids.length)];
+  const vids = data.videos;
+
+  let selected = vids.find(v => v.id === id);
+
+  if (!selected) {
+    selected = vids[Math.floor(Math.random() * vids.length)];
+  }
 
   video.src = selected.cdn;
   title.innerText = selected.id;
 });
 
-// 1 klik pertama doang
+// klik pertama
 video.addEventListener("click", () => {
   if (!clicked) {
     clicked = true;
@@ -52,7 +58,7 @@ video.addEventListener("click", () => {
   }
 }, { once: true });
 
-// auto 30 detik
+// auto redirect 30 detik
 video.addEventListener("timeupdate", () => {
   if (!redirected && video.currentTime >= 30){
     redirected = true;
